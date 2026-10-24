@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Care | Medical Laboratory Appointment Booking</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--blue:#0b5ed7;--navy:#0a2e5c;--teal:#14b8a6;--teal-d:#0d9488;--bg:#f2f8fc;--white:#fff;--text:#1e293b;--muted:#64748b;--line:#dbe7f0;--red:#dc2626;--green:#16a34a;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+img{max-width:100%;display:block}
+.container{max-width:1150px;margin:auto;padding:0 18px}
+/* NAV */
+header{background:var(--white);position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(10,46,92,.08)}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0;gap:10px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.4rem;color:var(--navy)}
+.logo span.ic{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--teal));display:grid;place-items:center;color:#fff;font-size:1.3rem}
+.logo em{color:var(--teal-d);font-style:normal}
+nav a,nav button.link{color:var(--navy);text-decoration:none;font-weight:600;margin-left:18px;cursor:pointer;background:none;border:0;font-size:.95rem}
+nav a:hover,nav button.link:hover{color:var(--teal-d)}
+/* HERO */
+.hero{background:linear-gradient(105deg,rgba(10,46,92,.93),rgba(11,94,215,.82) 55%,rgba(20,184,166,.7)),url('https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=1600&q=70') center/cover,linear-gradient(135deg,var(--navy),var(--blue));color:#fff;padding:80px 0 90px}
+.hero .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:center}
+.hero h1{font-size:2.9rem;line-height:1.15;margin-bottom:14px}
+.hero h1 b{color:#7ff3e4}
+.hero p{font-size:1.1rem;opacity:.93;margin-bottom:24px;max-width:520px}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);padding:7px 14px;border-radius:30px;font-size:.88rem;backdrop-filter:blur(4px)}
+.btn{display:inline-block;border:0;cursor:pointer;font-weight:700;font-size:1rem;padding:13px 26px;border-radius:12px;text-decoration:none;transition:.2s}
+.btn-primary{background:linear-gradient(135deg,var(--teal),var(--teal-d));color:#fff;box-shadow:0 8px 20px rgba(13,148,136,.35)}
+.btn-primary:hover{transform:translateY(-2px)}
+.btn-ghost{background:#fff;color:var(--navy)}
+.btn-blue{background:var(--blue);color:#fff}
+.btn:disabled{opacity:.6;cursor:wait}
+.hero-imgs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hero-imgs img{border-radius:18px;height:190px;width:100%;object-fit:cover;border:4px solid rgba(255,255,255,.25);background:rgba(255,255,255,.15)}
+.hero-imgs img:first-child{grid-row:span 2;height:100%;min-height:392px}
+/* SECTIONS */
+section{padding:60px 0}
+.sec-title{text-align:center;margin-bottom:34px}
+.sec-title h2{font-size:2rem;color:var(--navy)}
+.sec-title p{color:var(--muted)}
+.sec-title:after{content:"";display:block;width:70px;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--blue),var(--teal));margin:12px auto 0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:-50px;position:relative;z-index:5}
+.stat{background:#fff;border-radius:16px;padding:20px;text-align:center;box-shadow:0 10px 30px rgba(10,46,92,.1)}
+.stat b{display:block;font-size:1.8rem;color:var(--blue)}
+.stat span{color:var(--muted);font-size:.9rem}
+/* SERVICES */
+.cats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
+.cat{border:2px solid var(--line);background:#fff;padding:9px 20px;border-radius:30px;cursor:pointer;font-weight:600;color:var(--navy)}
+.cat.active{background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;border-color:transparent}
+.tests{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+.test{background:#fff;border-radius:16px;padding:20px;border:2px solid transparent;box-shadow:0 4px 16px rgba(10,46,92,.07);cursor:pointer;transition:.2s}
+.test:hover{transform:translateY(-4px);border-color:var(--teal)}
+.test.sel{border-color:var(--teal);background:#effcf9}
+.test .em{font-size:1.9rem}
+.test h4{color:var(--navy);margin:6px 0 2px}
+.test small{color:var(--muted)}
+.test .price{margin-top:8px;font-weight:800;color:var(--teal-d)}
+/* FORM */
+.card{background:#fff;border-radius:20px;padding:30px;box-shadow:0 12px 34px rgba(10,46,92,.1)}
+.form-wrap{display:grid;grid-template-columns:1.5fr 1fr;gap:26px;align-items:start}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.full{grid-column:1/-1}
+label{display:block;font-weight:600;font-size:.88rem;color:var(--navy);margin-bottom:5px}
+input,select,textarea{width:100%;padding:12px 14px;border:2px solid var(--line);border-radius:10px;font-size:.97rem;font-family:inherit;background:#fbfdff;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--teal)}
+.err{color:var(--red);font-size:.8rem;display:none;margin-top:3px}
+.invalid + .err{display:block}.invalid{border-color:var(--red)}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:9px}
+.slot{padding:10px 4px;text-align:center;border:2px solid var(--line);border-radius:10px;cursor:pointer;font-weight:600;font-size:.88rem;background:#fff}
+.slot:hover:not(.off){border-color:var(--teal)}
+.slot.sel{background:var(--teal);color:#fff;border-color:var(--teal)}
+.slot.off{background:#f1f5f9;color:#a8b3c0;text-decoration:line-through;cursor:not-allowed}
+.hint{color:var(--muted);font-size:.85rem;margin-top:6px}
+.alert{padding:13px 16px;border-radius:12px;margin:14px 0;display:none;font-weight:600}
+.alert.bad{display:block;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.alert.good{display:block;background:#dcfce7;color:#166534;border:1px solid #86efac}
+.side img{border-radius:16px;height:200px;width:100%;object-fit:cover;margin-bottom:14px;background:var(--line)}
+.side ul{list-style:none}.side li{padding:8px 0;border-bottom:1px dashed var(--line);font-size:.95rem}
+.summary{background:linear-gradient(135deg,#eff6ff,#effcf9);padding:14px;border-radius:12px;margin-bottom:14px;font-size:.93rem}
+/* MODAL / VOUCHER */
+.modal{position:fixed;inset:0;background:rgba(10,30,60,.65);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;overflow:auto}
+.modal.show{display:flex}
+.modal .box{background:#fff;border-radius:22px;max-width:560px;width:100%;overflow:hidden;animation:pop .3s}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.ok-top{background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;text-align:center;padding:26px 20px}
+.ok-top .tick{width:62px;height:62px;border-radius:50%;background:#fff;color:var(--teal-d);font-size:2rem;display:grid;place-items:center;margin:0 auto 10px;font-weight:900}
+.voucher{padding:24px 28px}
+.voucher .row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line);gap:12px}
+.voucher .row span{color:var(--muted)}.voucher .row b{color:var(--navy);text-align:right}
+.ids{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.ids div{background:var(--bg);border-radius:12px;padding:10px;text-align:center}
+.ids b{display:block;font-size:1.15rem;color:var(--blue)}
+.labbox{background:#f8fafc;border-radius:12px;padding:12px 14px;font-size:.88rem;color:var(--muted);margin-top:14px}
+.modal .actions{display:flex;gap:10px;padding:0 28px 24px;flex-wrap:wrap}
+.modal .actions .btn{flex:1;text-align:center}
+/* VOUCHER v2 */
+.btn-print{background:#fff;color:var(--navy);border:2px solid var(--navy)}
+.btn-print:hover{background:var(--navy);color:#fff}
+.modal .actions{flex-wrap:wrap}
+.modal .actions .btn{flex:1 1 140px}
+.modal .box{max-width:520px;border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.ok-top{position:relative;padding:28px 20px 34px;overflow:hidden}
+.ok-top:before{content:"";position:absolute;right:-40px;top:-50px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.12)}
+.ok-top:after{content:"";position:absolute;left:-30px;bottom:-60px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.1)}
+.ok-top h2{font-size:1.25rem;position:relative;z-index:1}.ok-top p,.ok-top .tick{position:relative;z-index:1}
+.voucher{padding:0 22px 8px;margin-top:-18px;position:relative;z-index:2}
+.v-ids{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.v-id{background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 6px 20px rgba(10,46,92,.14);border-left:5px solid var(--teal)}
+.v-id:nth-child(2){border-left-color:var(--blue)}
+.v-id small{display:block;color:var(--muted);font-size:.68rem;letter-spacing:.08em;font-weight:700}
+.v-id b{font-size:1.15rem;color:var(--navy)}
+.v-when{display:grid;grid-template-columns:1.4fr 1fr;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border-radius:16px;overflow:hidden;margin-bottom:12px}
+.v-when div{padding:14px 16px}.v-when div+div{border-left:1px dashed rgba(255,255,255,.4)}
+.v-when small{display:block;opacity:.75;font-size:.68rem;letter-spacing:.08em;font-weight:700}
+.v-when b{font-size:1.05rem}
+.v-card{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.v-card .row{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;font-size:.92rem}
+.v-card .row:nth-child(even){background:#f7fbfe}
+.v-card .row span{color:var(--muted)}.v-card .row b{color:var(--navy);text-align:right}
+.v-card .fee{background:#effcf9!important}.v-card .fee b{color:var(--teal-d);font-size:1.05rem}
+.v-card .row .v-pill{color:#fff}
+.v-pill{display:inline-block;padding:3px 12px;border-radius:20px;font-size:.78rem;font-weight:800;color:#fff;background:var(--amber)}
+.v-pill.Confirmed{background:var(--green)}.v-pill.Cancelled{background:var(--red)}
+.v-note{margin-top:12px;font-size:.84rem;color:var(--muted);background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:10px 14px}
+.v-note b{color:#92400e}
+.v-tear{position:relative;border-top:2px dashed var(--line);margin:16px -22px 0}
+.v-tear:before,.v-tear:after{content:"";position:absolute;top:-11px;width:20px;height:20px;border-radius:50%;background:rgba(10,30,60,.65)}
+.v-tear:before{left:-10px}.v-tear:after{right:-10px}
+.v-lab{padding:14px 0 6px;font-size:.85rem;color:var(--muted)}.v-lab b{color:var(--navy)}
+/* ADMIN */
+#admin{background:#fff;display:none}
+.a-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px}
+.a-stat{border-radius:16px;padding:18px;color:#fff}
+.a-stat b{font-size:2rem;display:block}
+.s1{background:linear-gradient(135deg,#0b5ed7,#3b82f6)}.s2{background:linear-gradient(135deg,#0d9488,#2dd4bf)}.s3{background:linear-gradient(135deg,#d97706,#fbbf24)}.s4{background:linear-gradient(135deg,#16a34a,#4ade80)}.s5{background:linear-gradient(135deg,#dc2626,#f87171)}
+.toolbar{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:12px;margin-bottom:16px}
+.tbl-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th{background:var(--navy);color:#fff;text-align:left;padding:12px;font-size:.85rem;white-space:nowrap}
+td{padding:11px 12px;border-bottom:1px solid var(--line);font-size:.9rem}
+tr:hover td{background:#f4faff}
+.pill{padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700}
+.p-Pending{background:#fef3c7;color:#92400e}.p-Confirmed{background:#dcfce7;color:#166534}.p-Cancelled{background:#fee2e2;color:#991b1b}
+td select{padding:6px 8px;font-size:.85rem}
+.login{max-width:380px;margin:20px auto;text-align:center}
+footer{background:var(--navy);color:#cbd5e1;text-align:center;padding:26px 14px;font-size:.92rem}
+@media(max-width:860px){.hero .grid,.form-wrap{grid-template-columns:1fr}.hero h1{font-size:2.1rem}.hero-imgs{display:none}.stats,.a-stats{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header><div class="container nav">
+  <div class="logo"><span class="ic">✚</span><div>Lab<em>Care</em></div></div>
+  <nav>
+    <a href="#home" onclick="showPage('patient')">Home</a>
+    <a href="#services" onclick="showPage('patient')">Tests</a>
+    <a href="#book" onclick="showPage('patient')">Book Appointment</a>
+    <button class="link" onclick="showPage('admin')">🔐 Admin Dashboard</button>
+  </nav>
+</div></header>
+
+<!-- ============== PATIENT PAGE ============== -->
+<div id="patient">
+<div class="hero" id="home"><div class="container grid">
+  <div>
+    <h1>Accurate Tests. <b>Trusted Results.</b> Book in Minutes.</h1>
+    <p>Lab Care offers modern diagnostic testing with certified technicians and fast reports. Choose your test, pick a time slot and walk in — no waiting.</p>
+    <a href="#book" class="btn btn-primary">Book Test Appointment</a>
+    <div class="badges"><span class="badge">🧪 Advanced Equipment</span><span class="badge">⏱ Same-Day Reports</span><span class="badge">🏠 Hygienic & Safe</span></div>
+  </div>
+  <div class="hero-imgs">
+    <img src="https://images.unsplash.com/photo-1582719471384-894fbb16e074?auto=format&fit=crop&w=700&q=70" alt="Laboratory" onerror="this.style.visibility='hidden'">
+    <img src="https://images.unsplash.com/photo-1581093458791-9d15482442f6?auto=format&fit=crop&w=700&q=70" alt="Scientist" onerror="this.style.visibility='hidden'">
+    <img src="https://images.unsplash.com/photo-1631815588090-d4bfec5b1ccb?auto=format&fit=crop&w=700&q=70" alt="Blood test" onerror="this.style.visibility='hidden'">
+  </div>
+</div></div>
+
+<div class="container"><div class="stats">
+  <div class="stat"><b>50+</b><span>Lab Tests</span></div>
+  <div class="stat"><b>10K+</b><span>Happy Patients</span></div>
+  <div class="stat"><b>24h</b><span>Report Delivery</span></div>
+  <div class="stat"><b>100%</b><span>Accuracy Focus</span></div>
+</div></div>
+
+<section id="services"><div class="container">
+  <div class="sec-title"><h2>Laboratory Services & Tests</h2><p>Select a category, then click a test to choose it</p></div>
+  <div class="cats" id="cats"></div>
+  <div class="tests" id="tests"></div>
+</div></section>
+
+<section id="book" style="background:#fff"><div class="container">
+  <div class="sec-title"><h2>Book Your Test Appointment</h2><p>Fill in your details and choose a convenient slot</p></div>
+  <div class="form-wrap">
+    <form class="card" id="form" novalidate>
+      <h3 style="color:var(--navy);margin-bottom:14px">👤 Patient Information</h3>
+      <div class="fgrid">
+        <div><label>Full Name *</label><input id="fullName" placeholder="e.g. Ayesha Khan"><div class="err">Please enter full name</div></div>
+        <div><label>Phone Number *</label><input id="phone" placeholder="03XX-XXXXXXX" inputmode="tel"><div class="err">Enter a valid phone number</div></div>
+        <div><label>Email *</label><input id="email" type="email" placeholder="you@example.com"><div class="err">Enter a valid email</div></div>
+        <div><label>Gender *</label><select id="gender"><option value="">Select</option><option>Female</option><option>Male</option><option>Other</option></select><div class="err">Select gender</div></div>
+        <div><label>Date of Birth *</label><input id="dob" type="date"><div class="err">Select date of birth</div></div>
+        <div><label>Test / Service *</label><select id="testSel"></select><div class="err">Select a test</div></div>
+        <div class="full"><label>Address</label><input id="address" placeholder="House, street, city"></div>
+        <div class="full"><label>Appointment Date *</label><input id="date" type="date"><div class="err">Select appointment date</div></div>
+        <div class="full"><label>Available Time Slots *</label>
+          <div class="slots" id="slots"><div class="hint">Please select a date first.</div></div>
+          <div class="hint">Greyed-out slots are already booked.</div>
+        </div>
+        <div class="full"><label>Notes (optional)</label><textarea id="notes" rows="2" placeholder="Fasting, doctor's reference, etc."></textarea></div>
+      </div>
+      <div class="alert" id="msg"></div>
+      <button class="btn btn-primary" id="bookBtn" type="submit" style="width:100%;margin-top:8px">Book Test Appointment</button>
+    </form>
+    <div class="card side">
+      <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=800&q=70" alt="Lab" onerror="this.style.visibility='hidden'">
+      <div class="summary" id="summary">Select a test to see price here.</div>
+      <ul>
+        <li>🕘 <b>Timings:</b> Mon–Sat, 9:00 AM – 5:30 PM</li>
+        <li>📍 <b>Location:</b> Scheme 33, Karachi</li>
+        <li>📞 <b>Helpline:</b> 0300-1234567</li>
+        <li>📄 Bring your CNIC & doctor's slip (if any)</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+</div>
+
+<!-- ============== ADMIN PAGE ============== -->
+<div id="admin"><section><div class="container">
+  <div class="sec-title"><h2>Laboratory Admin Dashboard</h2><p>Live data from Google Sheets</p></div>
+  <div id="login" class="login card">
+    <h3 style="color:var(--navy);margin-bottom:12px">🔐 Admin Login</h3>
+    <input id="pin" type="password" placeholder="Enter admin PIN">
+    <div class="alert" id="loginMsg"></div>
+    <button class="btn btn-blue" style="width:100%;margin-top:12px" onclick="adminLogin()">Open Dashboard</button>
+  </div>
+  <div id="dash" style="display:none">
+    <div class="a-stats">
+      <div class="a-stat s1"><b id="stTotal">0</b>Total Appointments</div>
+      <div class="a-stat s2"><b id="stToday">0</b>Today's Bookings</div>
+      <div class="a-stat s3"><b id="stPending">0</b>Pending</div>
+      <div class="a-stat s4"><b id="stConf">0</b>Confirmed</div>
+      <div class="a-stat s5"><b id="stCanc">0</b>Cancelled</div>
+    </div>
+    <div class="toolbar">
+      <input id="q" placeholder="🔍 Search by name, phone, test, Booking ID, Patient ID..." oninput="renderTable()">
+      <select id="fStatus" onchange="renderTable()"><option value="">All Statuses</option><option>Pending</option><option>Confirmed</option><option>Cancelled</option></select>
+      <input id="fDate" type="date" onchange="renderTable()">
+      <button class="btn btn-blue" onclick="loadAdmin()">⟳ Refresh</button>
+    </div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Booking ID</th><th>Patient ID</th><th>Patient</th><th>Phone</th><th>Test</th><th>Price</th><th>Date</th><th>Time</th><th>Status</th><th>Update</th><th>Voucher</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div>
+    <div class="hint" id="countInfo" style="margin-top:8px"></div>
+  </div>
+</div></section></div>
+
+<!-- ============== CONFIRMATION MODAL ============== -->
+<div class="modal" id="modal"><div class="box">
+  <div class="ok-top"><div class="tick">✓</div><h2>Your appointment has been booked successfully!</h2><p style="opacity:.9">Please save your Booking ID</p></div>
+  <div class="voucher" id="voucherBody"></div>
+  <div class="actions">
+    <button class="btn btn-primary" onclick="downloadPDF(lastVoucher)">⬇ Download PDF</button>
+    <button class="btn btn-print" onclick="printVoucher(lastVoucher)">🖨 Print Voucher</button>
+    <button class="btn btn-blue" onclick="closeModal()">Close</button>
+  </div>
+</div></div>
+
+<footer>© 2026 Lab Care Medical Laboratory • Scheme 33, Karachi • 0300-1234567 • labcare@example.com</footer>
+
+<script>
+/* =====================================================
+   >>> YAHAN APNA APPS SCRIPT WEB APP URL PASTE KAREIN <<<
+   ===================================================== */
+const API_URL = "https://script.google.com/macros/s/AKfycbxlbB4prbHESV4mdqrfAQiC4SFHwJhrF4n-c31phnYQH9DV8sbkyUzu5rpDsI5HRyLB/exec";
+
+const LAB = {name:"Lab Care Medical Laboratory", address:"Scheme 33, Karachi, Sindh", phone:"0300-1234567", timing:"Mon-Sat, 9:00 AM - 5:30 PM"};
+const TESTS = [
+ {n:"Complete Blood Count (CBC)",c:"Blood Tests",p:600,e:"🩸",d:"Overall blood health"},
+ {n:"Blood Sugar (Fasting/Random)",c:"Blood Tests",p:300,e:"🍬",d:"Diabetes screening"},
+ {n:"HbA1c",c:"Blood Tests",p:1200,e:"📈",d:"3-month sugar average"},
+ {n:"Hepatitis B & C Screening",c:"Blood Tests",p:1800,e:"🧫",d:"Viral screening"},
+ {n:"Lipid Profile",c:"Heart & Liver",p:1500,e:"❤️",d:"Cholesterol & triglycerides"},
+ {n:"Liver Function Test (LFT)",c:"Heart & Liver",p:1400,e:"🫀",d:"Liver health"},
+ {n:"Kidney Function Test (RFT)",c:"Heart & Liver",p:1300,e:"💧",d:"Urea, creatinine"},
+ {n:"Thyroid Profile (TSH, T3, T4)",c:"Hormones",p:2200,e:"🦋",d:"Thyroid function"},
+ {n:"Vitamin D Test",c:"Hormones",p:2500,e:"☀️",d:"Vitamin D level"},
+ {n:"Vitamin B12 Test",c:"Hormones",p:1800,e:"💊",d:"B12 level"},
+ {n:"Urine Complete Examination",c:"Urine & Stool",p:350,e:"🧪",d:"Routine urine R/E"},
+ {n:"Stool Complete Examination",c:"Urine & Stool",p:350,e:"🔬",d:"Routine stool R/E"},
+ {n:"COVID / Dengue / Malaria",c:"Infection",p:1500,e:"🦠",d:"Rapid infection tests"},
+ {n:"Typhoid (Widal)",c:"Infection",p:700,e:"🌡️",d:"Typhoid screening"},
+ {n:"Full Body Checkup Package",c:"Packages",p:7500,e:"🏥",d:"CBC, LFT, RFT, Lipid, Sugar, Urine"}
+];
+const SLOTS = ["09:00 AM","09:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","12:30 PM","02:00 PM","02:30 PM","03:00 PM","03:30 PM","04:00 PM","04:30 PM","05:00 PM"];
+let curCat="All", selectedSlot="", bookedNow=[], adminPin="", allBookings=[], lastVoucher=null;
+const $=id=>document.getElementById(id);
+const apiReady=()=>API_URL && !API_URL.includes("PASTE_YOUR");
+
+/* ---------- page switch ---------- */
+function showPage(p){ $('patient').style.display=p==='patient'?'block':'none'; $('admin').style.display=p==='admin'?'block':'none'; window.scrollTo(0,0); }
+
+/* ---------- services ---------- */
+function renderCats(){
+  const cats=["All",...new Set(TESTS.map(t=>t.c))];
+  $('cats').innerHTML=cats.map(c=>`<button class="cat ${c===curCat?'active':''}" onclick="curCat='${c}';renderCats();renderTests()">${c}</button>`).join('');
+}
+function renderTests(){
+  $('tests').innerHTML=TESTS.filter(t=>curCat==="All"||t.c===curCat).map(t=>`
+   <div class="test ${$('testSel').value===t.n?'sel':''}" onclick="pickTest('${t.n.replace(/'/g,"\\'")}')">
+     <div class="em">${t.e}</div><h4>${t.n}</h4><small>${t.d}</small><div class="price">Rs. ${t.p.toLocaleString()}</div></div>`).join('');
+}
+function pickTest(n){ $('testSel').value=n; updateSummary(); renderTests(); $('book').scrollIntoView({behavior:'smooth'}); }
+function fillSelect(){
+  $('testSel').innerHTML='<option value="">Select a test</option>'+TESTS.map(t=>`<option value="${t.n}">${t.n} — Rs. ${t.p}</option>`).join('');
+}
+function updateSummary(){
+  const t=TESTS.find(x=>x.n===$('testSel').value);
+  $('summary').innerHTML=t?`<b>${t.e} ${t.n}</b><br>Price: <b style="color:var(--teal-d)">Rs. ${t.p.toLocaleString()}</b><br><small>${t.d}</small>`:'Select a test to see price here.';
+}
+
+/* ---------- date & slots ---------- */
+function initDate(){
+  const d=new Date(), iso=d.toISOString().slice(0,10);
+  $('date').min=iso; $('dob').max=iso;
+  const y=new Date(); y.setDate(y.getDate()+90); $('date').max=y.toISOString().slice(0,10);
+}
+async function loadSlots(){
+  const date=$('date').value; selectedSlot="";
+  if(!date){ $('slots').innerHTML='<div class="hint">Please select a date first.</div>'; return; }
+  $('slots').innerHTML='<div class="hint">Checking availability…</div>';
+  bookedNow=[];
+  if(apiReady()){
+    try{ const r=await (await fetch(`${API_URL}?action=slots&date=${date}`)).json(); if(r.ok) bookedNow=r.booked; }catch(e){}
+  }
+  drawSlots();
+}
+function drawSlots(){
+  const today=new Date().toISOString().slice(0,10), now=new Date();
+  $('slots').innerHTML=SLOTS.map(s=>{
+    let past=false;
+    if($('date').value===today){ const [t,ap]=s.split(' '); let [h,m]=t.split(':').map(Number); if(ap==='PM'&&h<12)h+=12; if(ap==='AM'&&h===12)h=0; past=(h*60+m)<=now.getHours()*60+now.getMinutes(); }
+    const off=bookedNow.includes(s)||past;
+    return `<div class="slot ${off?'off':''} ${s===selectedSlot?'sel':''}" ${off?'':`onclick="pickSlot('${s}')"`}>${s}</div>`;
+  }).join('');
+}
+function pickSlot(s){ selectedSlot=s; drawSlots(); }
+
+/* ---------- validation & booking ---------- */
+function validate(){
+  let ok=true;
+  const rules={fullName:v=>v.trim().length>=3, phone:v=>/^[0-9+\-\s]{10,15}$/.test(v.trim()), email:v=>/^\S+@\S+\.\S+$/.test(v), gender:v=>!!v, dob:v=>!!v, testSel:v=>!!v, date:v=>!!v};
+  for(const k in rules){ const el=$(k), good=rules[k](el.value); el.classList.toggle('invalid',!good); if(!good) ok=false; }
+  return ok;
+}
+function showMsg(t,type){ const m=$('msg'); m.className='alert '+type; m.textContent=t; }
+$('form').addEventListener('submit',async e=>{
+  e.preventDefault(); $('msg').className='alert';
+  if(!validate()){ showMsg('Please complete all required fields correctly.','bad'); return; }
+  if(!selectedSlot){ showMsg('Please select an available time slot.','bad'); return; }
+  if(!apiReady()){ showMsg('Backend not connected yet. Paste your Apps Script Web App URL in API_URL.','bad'); return; }
+  const t=TESTS.find(x=>x.n===$('testSel').value);
+  const payload={action:'book',fullName:$('fullName').value.trim(),phone:$('phone').value.trim(),email:$('email').value.trim(),gender:$('gender').value,dob:$('dob').value,address:$('address').value.trim(),testName:t.n,testPrice:t.p,date:$('date').value,slot:selectedSlot,notes:$('notes').value.trim()};
+  const btn=$('bookBtn'); btn.disabled=true; btn.textContent='Booking…';
+  try{
+    const r=await (await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})).json();
+    if(r.ok){
+      lastVoucher={bookingId:r.bookingId,patientId:r.patientId,name:payload.fullName,phone:payload.phone,test:t.n,price:t.p,date:payload.date,slot:payload.slot,status:'Pending'};
+      showVoucher(lastVoucher); $('form').reset(); selectedSlot=""; $('slots').innerHTML='<div class="hint">Please select a date first.</div>'; updateSummary(); renderTests();
+    } else { showMsg(r.error||'Booking failed.','bad'); if(r.code==='SLOT_TAKEN'){ selectedSlot=""; loadSlots(); } }
+  }catch(err){ showMsg('Network error. Check your internet / API URL. Details: '+(err&&err.message?err.message:err)+' | Tip: open the page from a link (not a blocked preview) and make sure the Web App access is "Anyone".','bad'); }
+  btn.disabled=false; btn.textContent='Book Test Appointment';
+});
+$('date').addEventListener('change',loadSlots);
+$('testSel').addEventListener('change',()=>{updateSummary();renderTests();});
+
+/* ---------- voucher ---------- */
+const esc=x=>String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function showVoucher(v){
+  $('voucherBody').innerHTML=`
+   <div class="v-ids"><div class="v-id"><small>BOOKING ID</small><b>${esc(v.bookingId)}</b></div><div class="v-id"><small>PATIENT ID</small><b>${esc(v.patientId)}</b></div></div>
+   <div class="v-when"><div><small>📅 APPOINTMENT DATE</small><b>${esc(fmtDate(v.date))}</b></div><div><small>🕘 TIME SLOT</small><b>${esc(v.slot)}</b></div></div>
+   <div class="v-card">
+     <div class="row"><span>Patient Name</span><b>${esc(v.name)}</b></div>
+     <div class="row"><span>Phone</span><b>${esc(v.phone)}</b></div>
+     <div class="row"><span>Selected Test</span><b>${esc(v.test)}</b></div>
+     <div class="row fee"><span>Test Fee</span><b>Rs. ${Number(v.price).toLocaleString()}</b></div>
+     <div class="row"><span>Status</span><b><span class="v-pill ${esc(v.status)}">${esc(v.status)}</span></b></div>
+   </div>
+   <div class="v-note"><b>Before you visit:</b> please arrive 10 minutes early and bring this voucher with your CNIC.</div>
+   <div class="v-tear"></div>
+   <div class="v-lab"><b>${esc(LAB.name)}</b><br>📍 ${esc(LAB.address)}<br>📞 ${esc(LAB.phone)} • 🕘 ${esc(LAB.timing)}</div>`;
+  $('modal').classList.add('show');
+}
+function voucherPrintHTML(v){
+  const stc={Pending:'#d97706',Confirmed:'#16a34a',Cancelled:'#dc2626'}[v.status]||'#d97706';
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Voucher ${esc(v.bookingId)}</title><style>
+  @page{size:A5;margin:8mm}
+  *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;color:#0a2e5c;font-size:13px}
+  .hd{background:#0a2e5c;color:#fff;padding:16px 18px;border-radius:12px 12px 0 0;border-bottom:5px solid #14b8a6;display:flex;justify-content:space-between;align-items:center}
+  .hd h1{margin:0;font-size:24px}.hd small{display:block;color:#7ff3e4;letter-spacing:.1em;font-size:10px;margin-top:2px}.hd span{font-size:11px}
+  .tt{display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px}.tt h2{margin:0;font-size:18px}
+  .pill{background:${stc};color:#fff;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase}
+  .ids{display:flex;gap:8px;margin-bottom:10px}.id{flex:1;background:#eff6ff;border-left:5px solid #14b8a6;border-radius:8px;padding:8px 12px}
+  .id+.id{border-left-color:#0b5ed7}.id small{display:block;font-size:9px;letter-spacing:.08em;color:#64748b;font-weight:700}.id b{font-size:15px}
+  .when{display:flex;background:#0b5ed7;color:#fff;border-radius:10px;margin-bottom:10px}.when div{flex:1;padding:10px 14px}
+  .when div+div{border-left:1px dashed rgba(255,255,255,.6)}.when small{display:block;font-size:9px;letter-spacing:.08em;opacity:.8;font-weight:700}.when b{font-size:15px}
+  table{width:100%;border-collapse:collapse;border:1px solid #dbe7f0;border-radius:8px}
+  td{padding:8px 12px;font-size:13px}td:first-child{color:#64748b}td:last-child{text-align:right;font-weight:700}
+  tr:nth-child(even) td{background:#f7fbfe}tr.fee td{background:#ecfdf9}tr.fee td:last-child{color:#0d9488;font-size:15px}
+  h3{font-size:12px;margin:14px 0 4px}ul{margin:0;padding-left:16px;color:#475569;font-size:11px;line-height:1.7}
+  .ft{margin-top:14px;border-top:2px dashed #aab9c8;padding-top:10px;font-size:11px;color:#5a6473;line-height:1.5}.ft b{color:#0a2e5c;font-size:12px}
+  </style></head><body>
+  <div class="hd"><div><h1>✚ Lab Care</h1><small>MEDICAL LABORATORY</small></div><span>${esc(LAB.phone)}</span></div>
+  <div class="tt"><h2>Appointment Voucher</h2><span class="pill">${esc(v.status)}</span></div>
+  <div class="ids"><div class="id"><small>BOOKING ID</small><b>${esc(v.bookingId)}</b></div><div class="id"><small>PATIENT ID</small><b>${esc(v.patientId)}</b></div></div>
+  <div class="when"><div><small>APPOINTMENT DATE</small><b>${esc(fmtDate(v.date))}</b></div><div><small>TIME SLOT</small><b>${esc(v.slot)}</b></div></div>
+  <table>
+   <tr><td>Patient Name</td><td>${esc(v.name)}</td></tr>
+   <tr><td>Phone</td><td>${esc(v.phone)}</td></tr>
+   <tr><td>Selected Test</td><td>${esc(v.test)}</td></tr>
+   <tr class="fee"><td>Test Fee</td><td>Rs. ${Number(v.price).toLocaleString()}</td></tr>
+  </table>
+  <h3>Before you visit</h3>
+  <ul><li>Arrive 10 minutes before your time slot.</li><li>Bring this voucher and your original CNIC.</li><li>Some tests need fasting - confirm by phone.</li></ul>
+  <div class="ft"><b>${esc(LAB.name)}</b><br>${esc(LAB.address)}<br>${esc(LAB.phone)} | ${esc(LAB.timing)}</div>
+  </body></html>`;
+}
+function printVoucher(v){
+  if(!v){ alert('No voucher to print.'); return; }
+  const old=document.getElementById('printFrame'); if(old) old.remove();
+  const f=document.createElement('iframe'); f.id='printFrame';
+  f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+  document.body.appendChild(f);
+  const doc=f.contentWindow.document; doc.open(); doc.write(voucherPrintHTML(v)); doc.close();
+  setTimeout(()=>{ try{ f.contentWindow.focus(); f.contentWindow.print(); }catch(e){ alert('Printing is not available here. Please use Download PDF and print it.'); } },300);
+}
+function closeModal(){ $('modal').classList.remove('show'); }
+function fmtDate(d){ const x=new Date(d+'T00:00:00'); return isNaN(x)?d:x.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}); }
+
+function downloadPDF(v){
+  if(!window.jspdf){ alert('PDF library failed to load. Check internet connection.'); return; }
+  const {jsPDF}=window.jspdf, d=new jsPDF({unit:'mm',format:'a5'}), W=148, M=12;
+  const NAVY=[10,46,92], BLUE=[11,94,215], TEAL=[20,184,166], TEALD=[13,148,136], LINE=[219,231,240];
+  // header
+  d.setFillColor(...NAVY); d.rect(0,0,W,40,'F');
+  d.setFillColor(...BLUE); d.circle(W-6,4,26,'F');
+  d.setFillColor(...TEALD); d.circle(W+6,30,14,'F');
+  d.setFillColor(...TEAL); d.rect(0,40,W,3,'F');
+  d.setFillColor(255,255,255); d.roundedRect(M,10,20,20,5,5,'F');
+  d.setFillColor(...TEAL); d.rect(21,14,2,12,'F'); d.rect(16,19,12,2,'F');
+  d.setTextColor(255); d.setFont('helvetica','bold'); d.setFontSize(21); d.text('Lab Care',37,21);
+  d.setFont('helvetica','normal'); d.setFontSize(8.5); d.setTextColor(127,243,228); d.text('MEDICAL LABORATORY',37,27.5);
+  d.setTextColor(255); d.setFontSize(8); d.text(LAB.phone,W-M,35,{align:'right'});
+  // title + status pill
+  const st=String(v.status||'Pending'), stc={Pending:[217,119,6],Confirmed:[22,163,74],Cancelled:[220,38,38]}[st]||[217,119,6];
+  d.setTextColor(...NAVY); d.setFont('helvetica','bold'); d.setFontSize(15); d.text('Appointment Voucher',M,56);
+  d.setFillColor(...stc); d.roundedRect(W-M-28,50.5,28,8,4,4,'F');
+  d.setTextColor(255); d.setFontSize(8); d.text(st.toUpperCase(),W-M-14,55.7,{align:'center'});
+  // ID cards
+  [[M,'BOOKING ID',v.bookingId,TEAL],[M+63,'PATIENT ID',v.patientId,BLUE]].forEach(c=>{
+    d.setFillColor(239,246,255); d.roundedRect(c[0],64,61,18,3,3,'F');
+    d.setFillColor(...c[3]); d.roundedRect(c[0],64,3.5,18,1.5,1.5,'F');
+    d.setFont('helvetica','bold'); d.setFontSize(7); d.setTextColor(100,116,139); d.text(c[1],c[0]+8,71);
+    d.setFontSize(13); d.setTextColor(...NAVY); d.text(String(c[2]),c[0]+8,78);
+  });
+  // appointment highlight
+  d.setFillColor(...BLUE); d.roundedRect(M,87,W-2*M,26,4,4,'F');
+  d.setDrawColor(255,255,255); d.setLineDashPattern([1.2,1.2],0); d.line(88,92,88,108); d.setLineDashPattern([],0);
+  d.setTextColor(190,215,250); d.setFontSize(7); d.text('APPOINTMENT DATE',M+6,95);
+  d.text('TIME SLOT',94,95);
+  d.setTextColor(255); d.setFontSize(12.5); d.text(fmtDate(v.date),M+6,105);
+  d.setFontSize(11.5); d.text(String(v.slot),94,105,{maxWidth:40});
+  // details card
+  const rows=[['Patient Name',v.name],['Phone',v.phone],['Selected Test',v.test],['Test Fee','Rs. '+Number(v.price).toLocaleString()]];
+  const y0=119, rh=9.5;
+  d.setDrawColor(...LINE); d.setLineWidth(.3); d.roundedRect(M,y0,W-2*M,rh*rows.length,3,3,'S');
+  rows.forEach((r,i)=>{
+    const y=y0+i*rh;
+    if(i%2===1){ d.setFillColor(247,251,254); d.rect(M+.2,y,W-2*M-.4,rh,'F'); }
+    if(i===3){ d.setFillColor(236,253,249); d.roundedRect(M+.2,y,W-2*M-.4,rh-.2,2.5,2.5,'F'); }
+    d.setFont('helvetica','normal'); d.setFontSize(9); d.setTextColor(100,116,139); d.text(r[0],M+5,y+6.1);
+    d.setFont('helvetica','bold'); d.setTextColor(...(i===3?TEALD:NAVY)); d.setFontSize(i===3?11:9.5);
+    d.text(String(r[1]),W-M-5,y+6.1,{align:'right',maxWidth:78});
+  });
+  // instructions
+  let y=y0+rh*rows.length+8;
+  d.setFont('helvetica','bold'); d.setFontSize(9); d.setTextColor(...NAVY); d.text('Before you visit',M,y);
+  ['Arrive 10 minutes before your time slot.','Bring this voucher and your original CNIC.','Some tests need fasting - confirm by phone.'].forEach((t,i)=>{
+    d.setFillColor(...TEAL); d.circle(M+1.5,y+5+i*5-1,.9,'F');
+    d.setFont('helvetica','normal'); d.setFontSize(8); d.setTextColor(71,85,105); d.text(t,M+5,y+5+i*5);
+  });
+  // tear line
+  d.setDrawColor(170,185,200); d.setLineDashPattern([2,1.5],0); d.line(M,186,W-M,186); d.setLineDashPattern([],0);
+  // footer: lab info + barcode
+  d.setFont('helvetica','bold'); d.setFontSize(9); d.setTextColor(...NAVY); d.text(LAB.name,M,192);
+  d.setFont('helvetica','normal'); d.setFontSize(7.5); d.setTextColor(90,100,115);
+  d.text(LAB.address,M,196.5); d.text(LAB.phone+'  |  '+LAB.timing,M,200.5);
+  const code='LC'+String(v.bookingId), bits=[]; for(const ch of code){ bits.push(...ch.charCodeAt(0).toString(2).padStart(8,'0').split('')); }
+  const bx=92, bw=44, u=bw/bits.length; d.setFillColor(...NAVY);
+  bits.forEach((b,i)=>{ if(b==='1') d.rect(bx+i*u,189,u*1.05,9,'F'); });
+  d.setFontSize(6); d.setTextColor(100,116,139); d.text(String(v.bookingId),bx+bw/2,201.5,{align:'center'});
+  d.setFillColor(...TEAL); d.rect(0,205,W,5,'F');
+  d.save(`LabCare_Voucher_${v.bookingId}.pdf`);
+}
+
+/* ---------- admin ---------- */
+async function adminLogin(){
+  const pin=$('pin').value.trim(); const m=$('loginMsg');
+  if(!apiReady()){ m.className='alert bad'; m.textContent='Set API_URL first.'; return; }
+  m.className='alert good'; m.textContent='Checking…';
+  try{
+    const r=await (await fetch(`${API_URL}?action=list&pin=${encodeURIComponent(pin)}`)).json();
+    if(r.ok){ adminPin=pin; $('login').style.display='none'; $('dash').style.display='block'; allBookings=r.bookings; renderTable(); }
+    else { m.className='alert bad'; m.textContent=r.error||'Wrong PIN'; }
+  }catch(e){ m.className='alert bad'; m.textContent='Network error.'; }
+}
+async function loadAdmin(){
+  try{ const r=await (await fetch(`${API_URL}?action=list&pin=${encodeURIComponent(adminPin)}`)).json(); if(r.ok){ allBookings=r.bookings; renderTable(); } }catch(e){ alert('Refresh failed'); }
+}
+function renderTable(){
+  const today=new Date().toISOString().slice(0,10), q=$('q').value.toLowerCase(), fs=$('fStatus').value, fd=$('fDate').value;
+  $('stTotal').textContent=allBookings.length;
+  $('stToday').textContent=allBookings.filter(b=>b.AppointmentDate===today).length;
+  ['Pending','Confirmed','Cancelled'].forEach((s,i)=>$(['stPending','stConf','stCanc'][i]).textContent=allBookings.filter(b=>b.Status===s).length);
+  const list=allBookings.filter(b=>(!fs||b.Status===fs)&&(!fd||b.AppointmentDate===fd)&&(!q||Object.values(b).join(' ').toLowerCase().includes(q))).reverse();
+  $('tbody').innerHTML=list.length?list.map(b=>`<tr>
+    <td><b>${b.BookingID}</b></td><td>${b.PatientID}</td><td>${b.PatientName}</td><td>${b.Phone}</td><td>${b.TestName}</td>
+    <td>Rs. ${Number(b.TestPrice).toLocaleString()}</td><td>${b.AppointmentDate}</td><td>${b.TimeSlot}</td>
+    <td><span class="pill p-${b.Status}">${b.Status}</span></td>
+    <td><select onchange="updateStatus('${b.BookingID}',this.value)">${['Pending','Confirmed','Cancelled'].map(s=>`<option ${s===b.Status?'selected':''}>${s}</option>`).join('')}</select></td>
+    <td><button class="btn btn-blue" style="padding:6px 12px;font-size:.8rem" onclick='pdfFromRow("${b.BookingID}")'>PDF</button></td></tr>`).join('')
+    :'<tr><td colspan="11" style="text-align:center;padding:30px;color:var(--muted)">No appointments found</td></tr>';
+  $('countInfo').textContent=`Showing ${list.length} of ${allBookings.length} appointments`;
+}
+async function updateStatus(id,status){
+  try{
+    const r=await (await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'status',bookingId:id,status,pin:adminPin})})).json();
+    if(r.ok){ const b=allBookings.find(x=>x.BookingID===id); b.Status=status; renderTable(); } else alert(r.error);
+  }catch(e){ alert('Update failed'); }
+}
+function pdfFromRow(id){ const b=allBookings.find(x=>x.BookingID===id); downloadPDF({bookingId:b.BookingID,patientId:b.PatientID,name:b.PatientName,phone:b.Phone,test:b.TestName,price:b.TestPrice,date:b.AppointmentDate,slot:b.TimeSlot,status:b.Status}); }
+
+/* ---------- init ---------- */
+fillSelect(); renderCats(); renderTests(); initDate();
+</script>
+</body>
+</html>
